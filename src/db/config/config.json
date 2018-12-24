@@ -1,0 +1,24 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": null,
+    "database": "blocipedia",
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "operatorsAliases": false,
+    "port": 5432
+  },
+  "test": {
+    "username": "postgres",
+    "password": null,
+    "database": "blocipedia-test",
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "operatorsAliases": false,
+    "port": 5432
+  },
+  "production": {
+    "use_env_variable": "DATABASE_URL",
+    "dialect": "postgres"
+  }
+}
