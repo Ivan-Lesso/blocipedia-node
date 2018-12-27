@@ -21,9 +21,19 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   User.associate = function(models) {
     // associations can be defined here
+    User.hasMany(models.Wiki, {
+      foreignKey: "userId",
+      as: "wikis"
+    });
     User.afterCreate((user, callback) => {
       return sendgrid.sendConfirmationEmail(user);
     });
+  };
+  User.prototype.isAdmin = function() {
+    return this.role === "admin";
+  };
+  User.prototype.isOwner = function(wiki) {
+    return this.id === wiki.userId;
   };
   return User;
 };

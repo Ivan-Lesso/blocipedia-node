@@ -41,7 +41,8 @@ describe("POST /users", () => {
         url: base,
         form: {
           email: "user@example.com",
-          password: "123456789"
+          password: "123456789",
+          confirmationCode: "asdfasdfasdfasdfasdf"
         }
       }
 
@@ -71,7 +72,8 @@ describe("POST /users", () => {
           url: base,
           form: {
             email: "no",
-            password: "123456789"
+            password: "123456789",
+            confirmationCode: "asdfasdfasdfasdfasdf"
           }
         },
         (err, res, body) => {

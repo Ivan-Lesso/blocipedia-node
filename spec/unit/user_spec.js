@@ -22,7 +22,8 @@ describe("User", () => {
     it("should create a User object with a valid email and password", (done) => {
       User.create({
         email: "user@example.com",
-        password: "1234567890"
+        password: "1234567890",
+        confirmationCode: "asdfasdfasdfasdfasdf"
       })
       .then((user) => {
         expect(user.email).toBe("user@example.com");
@@ -40,7 +41,8 @@ describe("User", () => {
     it("should not create a user with invalid email or password", (done) => {
       User.create({
         email: "It's-a me, Mario!",
-        password: "1234567890"
+        password: "1234567890",
+        confirmationCode: "asdfasdfasdfasdfasdf"
       })
       .then((user) => {
 
@@ -62,13 +64,15 @@ describe("User", () => {
 // #5
       User.create({
         email: "user@example.com",
-        password: "1234567890"
+        password: "1234567890",
+        confirmationCode: "asdfasdfasdfasdfasdf"
       })
       .then((user) => {
 
         User.create({
           email: "user@example.com",
-          password: "nananananananananananananananana BATMAN!"
+          password: "nananananananananananananananana BATMAN!",
+          confirmationCode: "asdfasdfasdfasdfasdf"
         })
         .then((user) => {
 
