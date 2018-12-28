@@ -17,6 +17,11 @@ module.exports = (sequelize, DataTypes) => {
     confirmationCode: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    role: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
     }
   }, {});
   User.associate = function(models) {
@@ -30,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
   User.prototype.isAdmin = function() {
-    return this.role === "admin";
+    return this.role == 3;
   };
   User.prototype.isOwner = function(wiki) {
     return this.id === wiki.userId;

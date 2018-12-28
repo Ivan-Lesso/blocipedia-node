@@ -15,6 +15,21 @@ module.exports = {
       callback(err);
     })
   },
+  getAllPrivateWikis(req, callback) {
+    if(!req.user) {
+      req.flash("notice", "You are not authorized to do that.");
+      callback(401);
+    }
+    return Wiki.findAll({where: {private: true, userId: req.user.id}})
+
+  //#2
+    .then((wikis) => {
+      callback(null, wikis);
+    })
+    .catch((err) => {
+      callback(err);
+    })
+  },
   addWiki(newWiki, callback){
     return Wiki.create(newWiki)
     .then((wiki) => {

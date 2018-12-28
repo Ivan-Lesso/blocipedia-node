@@ -7,7 +7,16 @@ module.exports = {
        if(err) {
          res.redirect(500, "static/index");
        } else {
-         res.render("wikis/index", {title: "Wikis", wikis: wikis});
+         res.render("wikis/index", {title: "Public Wikis", wikis: wikis});
+       }
+     })
+  },
+  private(req, res, next) {
+     wikiQueries.getAllPrivateWikis(req, (err, wikis) => {
+       if(err) {
+         res.render("static/index");
+       } else {
+         res.render("wikis/private", {title: "Private Wikis", wikis: wikis});
        }
      })
   },
