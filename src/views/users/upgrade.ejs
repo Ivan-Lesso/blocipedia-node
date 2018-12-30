@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include ../static/partials/head.ejs %>
+    <script src="https://checkout.stripe.com/checkout.js"></script>
+  </head>
+  <body>
+
+    <!-- Navigation -->
+    <% include ../static/partials/navbar.ejs %>
+    <main class="container main-container">
+
+      <% include ../static/partials/messages.ejs %>
+
+      <h2>Blocipedia - Your Account</h2>
+      <hr />
+      <% if(currentUser && currentUser.role==0) { %>
+      <div class="container">The cost to upgrade your account is $15</div>
+      <div id="shop">
+        <form action="/users/upgrade" method="POST">
+          <script
+            src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+            data-key="pk_test_4cQxVkTTI2pazOwmlEzvwIdp"
+            data-amount="1500"
+            data-name="Stripe.com"
+            data-description="Example charge"
+            data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+            data-locale="auto"
+            data-zip-code="true">
+          </script>
+        </form>
+      </div>
+      <% } else { %>
+      <div class="container">You are a premium user.</div>
+      <form action="/users/downgrade" method="POST">
+        <button type="submit" class="btn btn-danger">Downgrade</button>
+      </form>
+      <% } %>
+    </main>
+    <% include ../static/partials/baseScripts.ejs %>
+
+  </body>
+</html>

@@ -44,6 +44,22 @@ module.exports = {
 
         }
       })
-    }
-
+    },
+  changeRole(user, role, callback){
+    return User.findById(user.id)
+    .then((user) => {
+      if(!user){
+        return callback("User not found");
+      }
+      user.update({
+        role: role
+      })
+      .then(() => {
+        callback(null, user);
+      })
+      .catch((err) => {
+        callback(err);
+      });
+    });
+  }
 }
