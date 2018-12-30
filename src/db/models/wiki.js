@@ -25,6 +25,11 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "userId",
       onDelete: "CASCADE"
     });
+    Wiki.addScope("privateWikis", (userId) => {
+      return {
+        where: { userId: userId, private: true }
+      }
+    });
   };
   return Wiki;
 };

@@ -11,6 +11,10 @@ module.exports = class WikiPolicy extends ApplicationPolicy {
     return this.new();
   }
 
+  createPrivate() {
+    return (this._isAdmin() || this._isPremium())
+  }
+
   edit() {
     if(this.record.private==1) return (this._isAdmin() || this._isOwner());
     else return this.create();

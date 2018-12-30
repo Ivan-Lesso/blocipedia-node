@@ -1,5 +1,6 @@
 const userQueries = require("../db/queries.users.js");
 const paymentQueries = require("../db/queries.payments.js");
+const wikiQueries = require("../db/queries.payments.js");
 const passport = require("passport");
 const keyPublishable = process.env.PUBLISHABLE_KEY;
 const keySecret = process.env.SECRET_KEY;

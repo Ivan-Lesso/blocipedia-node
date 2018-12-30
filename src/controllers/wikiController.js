@@ -32,7 +32,10 @@ module.exports = {
 
   },
   create(req, res, next) {
-    const authorized = req.user?new Authorizer(req.user).create():false;
+
+    let authorized;
+    if(!req.body.private) authorized = req.user?new Authorizer(req.user).create():false;
+    else authorized = req.user?new Authorizer(req.user).createPrivate():false;
     if(authorized) {
       let newWiki= {
         title: req.body.title,

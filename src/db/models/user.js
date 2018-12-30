@@ -37,9 +37,26 @@ module.exports = (sequelize, DataTypes) => {
     User.afterCreate((user, callback) => {
       return sendgrid.sendConfirmationEmail(user);
     });
+    User.afterUpdate((user, callback) => {
+      if(user.isStandard())
+      {
+        models.Wiki.scope({method: ["privateWikis", user.id]}).all()
+        .then((wikis) => {
+          wikis.forEach((wiki) => {
+            wiki.update({private: false});
+          });
+        });
+      }
+    });
   };
   User.prototype.isAdmin = function() {
-    return this.role == 3;
+    return this.role == 2;
+  };
+  User.prototype.isPremium = function() {
+    return this.role == 1;
+  };
+  User.prototype.isStandard = function() {
+    return this.role == 0;
   };
   User.prototype.isOwner = function(wiki) {
     return this.id === wiki.userId;

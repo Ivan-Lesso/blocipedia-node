@@ -14,9 +14,11 @@
           <li class="nav-item">
             <a class="nav-link" href="/wikis">Public Wikis</a>
           </li>
+          <% if(currentUser.isPremium() || currentUser.isAdmin()) { %>
           <li class="nav-item">
             <a class="nav-link" href="/wikis/private">Private Wikis</a>
           </li>
+          <% }%>
           <li class="nav-item">
             <a class="nav-link" href="/users/upgrade"><%= (currentUser && currentUser.role)==1?" Downgrade":" Upgrade" %></a>
           </li>

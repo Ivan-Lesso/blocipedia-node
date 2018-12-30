@@ -33,11 +33,16 @@
       <% } else { %>
       <div class="container">You are a premium user.</div>
       <form action="/users/downgrade" method="POST">
-        <button type="submit" class="btn btn-danger">Downgrade</button>
+        <button type="submit" class="btn btn-danger" onclick="clicked(event)">Downgrade</button>
       </form>
       <% } %>
     </main>
     <% include ../static/partials/baseScripts.ejs %>
-
+    <script>
+    function clicked(e)
+    {
+      if(!confirm('Are you sure? All of your private wikis will become public.'))e.preventDefault();
+    }
+    </script>
   </body>
 </html>
