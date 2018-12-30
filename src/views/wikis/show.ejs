@@ -8,7 +8,7 @@
 
     <main class="container main-container">
       <% include ../static/partials/messages.ejs %>
-      <h1><%= wiki.title %></h1>
+      <h1><%= wiki.title %><%= (wiki.private)?" (Private Wiki)":"" %></h1>
 
       <% if(currentUser) { %>
         <a href="/wikis/<%= wiki.id %>/edit" class="btn btn-warning">Edit</a>
@@ -19,7 +19,7 @@
        </form>
         <% } %>
       <% } %>
-      <p><%= wiki.body %></p>
+      <p><%- wiki.body %></p>
     </main>
 
     <% include ../static/partials/baseScripts.ejs %>
