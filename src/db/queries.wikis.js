@@ -70,6 +70,7 @@ module.exports = {
       }
       const authorized = req.user?new Authorizer(req.user, wiki).update():false;
       if(authorized) {
+        updatedWiki.private = updatedWiki.private?true:false;
         wiki.update(updatedWiki, {
           fields: Object.keys(updatedWiki)
         })
