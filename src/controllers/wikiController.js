@@ -69,10 +69,11 @@ module.exports = {
       };
       wikiQueries.addWiki(newWiki, (err, wiki) => {
         if(err){
+          console.log(err);
           res.redirect(500, "/wikis/new");
         } else {
           let errors = false;
-          if(req.body.collaborators.length>0)
+          if(req.body.collaborators && req.body.collaborators.length>0)
           {
             req.body.collaborators.forEach((collaborator) => {
               collaboratorQueries.addCollaborator(req, collaborator, (err, collab) => {
