@@ -1,4 +1,6 @@
 const wikiQueries = require("../db/queries.wikis.js");
+const userQueries = require("../db/queries.users.js");
+const collaboratorQueries = require("../db/queries.collaborators.js");
 const Authorizer = require("../policies/wiki");
 const markdown = require( "markdown" ).markdown;
 
@@ -21,11 +23,33 @@ module.exports = {
        }
      })
   },
+  collaborations(req, res, next) {
+     wikiQueries.getAllCollaborations(req, (err, wikis) => {
+       if(err) {
+         req.flash("error",err);
+         res.render("static/index");
+       } else {
+         res.render("wikis/collaborations", {title: "Collaborations", wikis: wikis});
+       }
+     })
+  },
   new(req, res, next){
     const authorized = req.user?new Authorizer(req.user).new():false;
 
     if(authorized) {
-      res.render("wikis/new");
+      userQueries.getUsers((err, users) => {
+        if(err) {
+          req.flash("error", "Something went wrong. Check the logs.");
+          res.redirect(500,"/wikis");
+        }
+        else {
+          let collaborators = [];
+          users.forEach((user) => {
+            collaborators.push({id: user.id, email: user.email, collaborator: false});
+          });
+          res.render("wikis/new", {collaborators});
+        }
+      })
     } else {
       req.flash("notice", "You are not authorized to do that.");
       res.redirect("/wikis");
@@ -33,7 +57,6 @@ module.exports = {
 
   },
   create(req, res, next) {
-
     let authorized;
     if(!req.body.private) authorized = req.user?new Authorizer(req.user).create():false;
     else authorized = req.user?new Authorizer(req.user).createPrivate():false;
@@ -48,7 +71,17 @@ module.exports = {
         if(err){
           res.redirect(500, "/wikis/new");
         } else {
-          res.redirect(303, `/wikis/${wiki.id}`);
+          let errors = false;
+          if(req.body.collaborators.length>0)
+          {
+            req.body.collaborators.forEach((collaborator) => {
+              collaboratorQueries.addCollaborator(req, collaborator, (err, collab) => {
+                if(err) errors = true;
+              })
+            })
+          }
+          if(!errors) res.redirect(303, `/wikis/${wiki.id}`);
+          else res.redirect(500, "/wikis/new");
         }
       });
     }
@@ -58,12 +91,24 @@ module.exports = {
     }
   },
   show(req, res, next)  {
-    wikiQueries.getWiki(req.params.id, (err, wiki) => {
+    wikiQueries.getWiki(parseInt(req.params.id), (err, wiki) => {
       if(err || wiki == null){
         res.redirect(404, "/");
       } else {
-        wiki.body = markdown.toHTML(wiki.body);
-        res.render("wikis/show", {wiki});
+        let collaborators = [];
+        wiki.collaborators.forEach((collaborator) => {
+          collaborators.push(collaborator.userId);
+        })
+        let authorized = req.user?new Authorizer(req.user, wiki, collaborators).show():false;
+
+        if(authorized) {
+          wiki.body = markdown.toHTML(wiki.body);
+          res.render("wikis/show", {wiki});
+        }
+        else {
+          req.flash("notice", "You are not authorized to do that.");
+          res.redirect("/wikis");
+        }
       }
     });
   },
@@ -78,12 +123,37 @@ module.exports = {
   },
   edit(req, res, next){
     wikiQueries.getWiki(req.params.id, (err, wiki) => {
-      const authorized = new Authorizer(req.user, wiki).edit();
+      let wikiCollaborators = [];
+      wiki.collaborators.forEach((collaborator) => {
+        wikiCollaborators.push(collaborator.userId);
+      })
+      let authorized = req.user?new Authorizer(req.user, wiki, wikiCollaborators).show():false;
+
       if(authorized) {
         if(err || wiki == null){
           res.redirect(404, "/");
-        } else {
-          res.render("wikis/edit", {wiki});
+        }
+        else
+        {
+          userQueries.getUsers((err, users) => {
+            if(err) {
+              req.flash("error", "Something went wrong. Check the logs.");
+              res.redirect(500,"/wikis");
+            }
+            else {
+              let allCollaborators = [];
+              users.forEach((user) => {
+                let isCollaborator = false;
+                allCollaborators.push({id: user.id, email: user.email, collaborator: isCollaborator});
+              });
+              allCollaborators.forEach((collab) => {
+                if(wikiCollaborators.includes(collab.id)) {
+                  collab.collaborator=true;
+                }
+              })
+              res.render("wikis/edit", {wiki, allCollaborators});
+            }
+          });
         }
       }
       else {
@@ -92,13 +162,35 @@ module.exports = {
       }
     });
   },
-  update(req, res, next){
+  update(req, res, next) {
+    let wikiCollaborators = req.body.collaborators;
      wikiQueries.updateWiki(req, req.body, (err, wiki) => {
        if(err || wiki == null){
          res.redirect(404, `/wikis/${req.params.id}/edit`);
        } else {
-         req.flash("notice", "Wiki was updated.");
-         res.redirect(`/wikis/${req.params.id}`);
+         let errors = false;
+         collaboratorQueries.deleteAll(req, (err, updatedWiki) => {
+           if(err || updatedWiki == null) {
+             res.redirect(404, `/wikis/${req.params.id}/edit`);
+           }
+           else
+           {
+             if(wikiCollaborators.length>0)
+             {
+               wikiCollaborators.forEach((collaborator) => {
+                 collaboratorQueries.addCollaborator(req, collaborator, (err, collab) => {
+                   if(err) {
+                     errors = true;
+                   }
+                 })
+               })
+             }
+           }
+         })
+         if(!errors) {
+           req.flash("notice", "Wiki was updated.");
+           res.redirect(`/wikis/${req.params.id}`);
+         }
        }
      });
    }

@@ -1,5 +1,6 @@
 const Wiki = require("./models").Wiki;
 const User = require("./models").User;
+const Collaborator = require("./models").Collaborator;
 const Authorizer = require("../policies/wiki");
 
 module.exports = {
@@ -16,13 +17,12 @@ module.exports = {
     })
   },
   getAllPrivateWikis(req, callback) {
-
     let where = null;
     if(req.user.isAdmin()) where = {where: {private: true}};
     else if(req.user.isPremium()) where = {where: {private: true, userId: req.user.id}}
 
     if(where !== null) {
-      return Wiki.findAll({where: {private: true, userId: req.user.id}})
+      return Wiki.findAll(where)
       .then((wikis) => {
         callback(null, wikis);
       })
@@ -34,6 +34,15 @@ module.exports = {
       req.flash("notice", "You are not authorized to do that.");
       callback(401);
     }
+  },
+  getAllCollaborations(req, callback) {
+    Wiki.scope({method: ["collaborations", req.user.id]}).all()
+    .then((wikis) => {
+      callback(null, wikis);
+    })
+    .catch((err) => {
+      callback(err);
+    });
   },
   addWiki(newWiki, callback){
     return Wiki.create(newWiki)
@@ -63,20 +72,33 @@ module.exports = {
     });
   },
   updateWiki(req, updatedWiki, callback){
-    return Wiki.findById(req.params.id)
+    return Wiki.findById(req.params.id, {
+      include: [
+        {model: Collaborator, as: "collaborators"}
+      ]
+    })
     .then((wiki) => {
       if(!wiki){
         return callback("Wiki not found");
       }
-      const authorized = req.user?new Authorizer(req.user, wiki).update():false;
+      let wikiCollaborators = [];
+      wiki.collaborators.forEach((collaborator) => {
+        wikiCollaborators.push(collaborator.userId);
+      })
+      const authorized = req.user?new Authorizer(req.user, wiki, wikiCollaborators).update():false;
       if(authorized) {
-        wiki.update(updatedWiki, {
-          fields: Object.keys(updatedWiki)
+        let adjustedWiki = updatedWiki;
+        adjustedWiki.private = updatedWiki.private?true:false;
+        delete adjustedWiki.collaborators;
+
+        wiki.update(adjustedWiki, {
+          fields: Object.keys(adjustedWiki)
         })
         .then(() => {
           callback(null, wiki);
         })
         .catch((err) => {
+          console.log(err);
           callback(err);
         });
       }
@@ -89,7 +111,7 @@ module.exports = {
   getWiki(id, callback){
     return Wiki.findById(id, {
       include: [
-        {model: User}
+        {model: Collaborator, as: "collaborators"}
       ]
     })
     .then((wiki) => {
@@ -97,6 +119,7 @@ module.exports = {
     })
     .catch((err) => {
       callback(err);
+      console.log(err);
     })
   }
 }

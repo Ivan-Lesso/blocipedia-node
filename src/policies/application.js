@@ -1,22 +1,27 @@
 module.exports = class ApplicationPolicy {
 
  // #1
-  constructor(user, record) {
+  constructor(user, record, collaborators=null) {
     this.user = user;
     this.record = record;
+    this.collaborators = collaborators;
   }
 
  // #2
   _isOwner() {
-    return this.record && (this.record.userId == this.user.id);
+    return this.record && (this.record.userId === this.user.id);
   }
 
   _isPremium() {
-    return this.user && this.user.role == 1;
+    return this.user && this.user.role === 1;
   }
 
   _isAdmin() {
-    return this.user && this.user.role == 2;
+    return this.user && this.user.role === 2;
+  }
+
+  _isCollaborator() {
+    return this.collaborators.includes(this.user.id);
   }
 
  // #3
