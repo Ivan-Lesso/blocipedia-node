@@ -43,11 +43,11 @@ module.exports = {
           res.redirect(500,"/wikis");
         }
         else {
-          let collaborators = [];
+          let allCollaborators = [];
           users.forEach((user) => {
-            collaborators.push({id: user.id, email: user.email, collaborator: false});
+            allCollaborators.push({id: user.id, email: user.email, collaborator: false});
           });
-          res.render("wikis/new", {collaborators});
+          res.render("wikis/new", {allCollaborators});
         }
       })
     } else {
