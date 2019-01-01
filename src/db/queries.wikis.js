@@ -87,18 +87,12 @@ module.exports = {
       })
       const authorized = req.user?new Authorizer(req.user, wiki, wikiCollaborators).update():false;
       if(authorized) {
-<<<<<<< HEAD
-        updatedWiki.private = updatedWiki.private?true:false;
-        wiki.update(updatedWiki, {
-          fields: Object.keys(updatedWiki)
-=======
         let adjustedWiki = updatedWiki;
         adjustedWiki.private = updatedWiki.private?true:false;
         delete adjustedWiki.collaborators;
 
         wiki.update(adjustedWiki, {
           fields: Object.keys(adjustedWiki)
->>>>>>> collab
         })
         .then(() => {
           callback(null, wiki);
