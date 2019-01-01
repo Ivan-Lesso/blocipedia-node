@@ -16,7 +16,7 @@ module.exports = class WikiPolicy extends ApplicationPolicy {
   }
 
   edit() {
-    if(this.record.private==1) return (this._isAdmin() || this._isOwner());
+    if(this.record.private===true) return (this._isAdmin() || this._isOwner() || this._isCollaborator());
     else return this.create();
   }
 
@@ -28,7 +28,7 @@ module.exports = class WikiPolicy extends ApplicationPolicy {
     return this.update();
   }
   show() {
-    if(this.record.private==1) return (this._isAdmin() || this._isOwner());
+    if(this.record.private===true) return (this._isAdmin() || this._isOwner() || this._isCollaborator());
     else return true;
   }
 }

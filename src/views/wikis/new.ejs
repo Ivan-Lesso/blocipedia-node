@@ -27,6 +27,7 @@
           <input type="checkbox" class="form-control" name="private" aria-describedby="privateHelp">
           <small class="text-muted" id="privateHelp">indicate whether this Wiki is private.</small>
         </div>
+        <% include ../static/partials/collaborators.ejs %>
         <% }%>
         <button type="submit" class="btn btn-primary">Submit</button>
       </form>

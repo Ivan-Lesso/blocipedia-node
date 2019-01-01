@@ -34,6 +34,10 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "userId",
       as: "payments"
     });
+    User.hasMany(models.Collaborator, {
+      foreignKey: "userId",
+      as: "collaborators"
+    });
     User.afterCreate((user, callback) => {
       return sendgrid.sendConfirmationEmail(user);
     });

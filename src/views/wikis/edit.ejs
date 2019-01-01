@@ -24,15 +24,23 @@
           <textarea rows="4" class="form-control" name="body" placeholder="Enter Body"><%= wiki.body %></textarea>
           <small class="text-muted" id="bodyHelp">body must be 10 or more characters in length.</small>
         </div>
+        <% let checked = wiki.private ? "checked" : "" %>
         <% if(currentUser.isPremium() || currentUser.isAdmin()) { %>
         <div class="form-group">
           <label for="private">Private</label>
 <!-- #2 -->
-          <% let checked = wiki.private ? "checked" : "" %>
-          <input <%= checked %> type="checkbox" class="form-control" name="private" aria-describedby="privateHelp">
+          <input <%= checked %> type="checkbox" class="form-control" name="private" aria-describedby="privateHelp" value="true">
           <small class="text-muted" id="privateHelp">indicate whether this Wiki is private.</small>
+          <container>
+            <% include ../static/partials/collaborators.ejs %>
+          </container>
         </div>
-        <% }%>
+        <% } else { %>
+          <input <%= checked %> type="hidden" name="private" value="true">
+          <container style='display: none'>
+            <% include ../static/partials/collaborators.ejs %>
+          </container>
+        <% } %>
         <button type="submit" class="btn btn-primary">Update</button>
       </form>
     </main>

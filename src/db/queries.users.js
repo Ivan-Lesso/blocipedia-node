@@ -32,19 +32,30 @@ module.exports = {
   },
   getUser(id, callback){
    // #1
-      let result = {};
-      User.findById(id)
-      .then((user) => {
-   // #2
-        if(!user) {
-          callback(404);
-        } else {
-   // #3
-          result["user"] = user;
-
-        }
-      })
-    },
+    let result = {};
+    User.findById(id)
+    .then((user) => {
+      if(!user) {
+        callback(404);
+      } else {
+        result["user"] = user;
+        callback(null, result);
+      }
+    })
+  },
+  getUsers(callback){
+   // #1
+    let result = {};
+    User.findAll()
+    .then((users) => {
+ // #2
+      if(!users) {
+        callback(404);
+      } else {
+        callback(null, users);
+      }
+    })
+  },
   changeRole(user, role, callback){
     return User.findById(user.id)
     .then((user) => {

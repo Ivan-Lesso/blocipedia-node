@@ -1,0 +1,18 @@
+Collaborators:
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Email</th>
+      <th scope="col">Collaborator</th>
+    </tr>
+  </thead>
+  <tbody>
+
+  <% allCollaborators.forEach((collaborator) => { %>
+    <tr>
+      <th scope="row"><%= `${collaborator.email}` %></th>
+      <td><input type="checkbox" id="collaborator" name="collaborators[]" value="<%= `${collaborator.id}` %>" <%= collaborator.collaborator===true?"checked":"" %> <%= collaborator.id===currentUser.id?"checked disabled":"" %>></td>
+    </tr>
+  <% }) %>
+  </tbody>
+  </table>
