@@ -26,7 +26,7 @@ module.exports = {
         callback(null, user);
       })
       .catch((err) => {
-        callback(err);
+        callback(err.errors);
       })
     });
   },
